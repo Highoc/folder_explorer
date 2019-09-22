@@ -3,7 +3,6 @@ from django.db import models
 import uuid
 
 
-
 class Folder(models.Model):
     name = models.CharField(
         max_length=32,
@@ -13,6 +12,8 @@ class Folder(models.Model):
     parent_folder = models.ForeignKey(
         'core.Folder',
         related_name='folders',
+        null=True,
+        blank=True,
         verbose_name='Родительская папка',
         on_delete=models.CASCADE
     )

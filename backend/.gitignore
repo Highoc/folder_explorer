@@ -89,3 +89,5 @@ venv/
 .idea
 
 DJANGO_SECRET_KEY
+db.sqlite3
+images/
