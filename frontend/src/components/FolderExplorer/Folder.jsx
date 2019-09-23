@@ -27,6 +27,8 @@ class Folder extends Component {
     if (filetree[id] !== undefined) {
       folders = filetree[id].folders;
       images = filetree[id].images;
+      folders.sort((a, b) => (b.name < a.name) - (a.name < b.name));
+      images.sort((a, b) => (b.name < a.name) - (a.name < b.name));
     }
 
     this.state = {
@@ -51,6 +53,8 @@ class Folder extends Component {
       if (filetreeNew[id] !== undefined) {
         folders = filetreeNew[id].folders;
         images = filetreeNew[id].images;
+        folders.sort((a, b) => (b.name < a.name) - (a.name < b.name));
+        images.sort((a, b) => (b.name < a.name) - (a.name < b.name));
       }
 
       this.setState({ folders, images });
@@ -104,6 +108,12 @@ class Folder extends Component {
     this.onDialogClick();
   }
 
+  onRemoveImage(key) {
+    const { images: oldImages } = this.state;
+    const images = oldImages.filter((current) => current.key !== key);
+    this.setState({ images });
+  }
+
   onUpdateFolderClick(event) {
     event.stopPropagation();
 
@@ -128,6 +138,7 @@ class Folder extends Component {
     switch (action.type) {
       case 'folder-create':
         folders.push(data);
+        folders.sort((a, b) => (b.name < a.name) - (a.name < b.name));
         this.setState({ folders });
         break;
       case 'folder-update':
@@ -135,6 +146,7 @@ class Folder extends Component {
         break;
       case 'image-create':
         images.push(data);
+        images.sort((a, b) => (b.name < a.name) - (a.name < b.name));
         this.setState({ images });
         break;
       default:
@@ -202,6 +214,7 @@ class Folder extends Component {
                       mime={current.mime}
                       forms={forms}
                       onChangePreview={(value) => onChangePreview(value)}
+                      onRemoveImage={(key) => this.onRemoveImage(key)}
                     />
                   ))
                 }

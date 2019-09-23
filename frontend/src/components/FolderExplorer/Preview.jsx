@@ -7,6 +7,7 @@ import {
 
 import classes from './static/FolderExplorer.module.css';
 import patch from './media/patch.png';
+import { BACKEND_URL } from '../../helpers/urls';
 
 class Preview extends Component {
   constructor(props) {
@@ -26,7 +27,7 @@ class Preview extends Component {
         name, description, key, mime,
       } = nextProps.image;
       const type = mime.split('/')[1];
-      const url = `http://192.168.43.230:8000/uploads/images/${key}.${type}`;
+      const url = `${BACKEND_URL}/uploads/images/${key}.${type}`;
       this.setState({ name, description, url });
     }
   }

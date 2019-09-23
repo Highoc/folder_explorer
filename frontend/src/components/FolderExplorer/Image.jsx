@@ -15,6 +15,7 @@ import axios from 'axios';
 import ServerForm from '../ServerForm/ServerForm';
 
 import classes from './static/FolderExplorer.module.css';
+import { BACKEND_URL } from '../../helpers/urls';
 
 class Image extends Component {
   constructor(props) {
@@ -85,7 +86,9 @@ class Image extends Component {
   async removeImage() {
     try {
       const { key } = this.state;
-      await axios.post(`http://192.168.43.230:8000/core/image/delete/${key}/`);
+      const { onRemoveImage } = this.props;
+      await axios.post(`${BACKEND_URL}/core/image/delete/${key}/`);
+      onRemoveImage(key);
     } catch (error) {
       console.log(error);
     }
@@ -97,7 +100,7 @@ class Image extends Component {
     } = this.state;
 
     const mediaType = mime.split('/')[1];
-    const mediaUrl = `http://192.168.43.230:8000/uploads/images/${key}.${mediaType}`;
+    const mediaUrl = `${BACKEND_URL}/core/image/download/${key}/`;
     const mediaName = `${name}.${mediaType}`;
 
     return (
@@ -135,7 +138,7 @@ class Image extends Component {
             {action.title}
             <Close className={classes.close} onClick={() => this.onDialogClick()} />
           </DialogTitle>
-          <DialogContent>
+          <DialogContent className={classes.content}>
             <ServerForm
               action={action.action}
               enctype={action.enctype}
@@ -161,4 +164,5 @@ Image.propTypes = {
   mime: PropTypes.string.isRequired,
   forms: PropTypes.object.isRequired,
   onChangePreview: PropTypes.func.isRequired,
+  onRemoveImage: PropTypes.func.isRequired,
 };

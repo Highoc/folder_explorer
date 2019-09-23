@@ -9,6 +9,7 @@ import { Button, withStyles } from '@material-ui/core';
 import Input from '../Inputs/Input';
 
 import styles from './styles';
+import { BACKEND_URL } from '../../helpers/urls';
 
 const json = { 'Content-Type': 'application/json' };
 const multipart = { 'Content-Type': 'multipart/form-data' };
@@ -44,7 +45,7 @@ class ServerForm extends Component {
     };
 
     this.backend = (headers) => axios.create({
-      baseURL: 'http://192.168.43.230:8000',
+      baseURL: BACKEND_URL,
       timeout: 50000,
       headers,
     });
@@ -82,7 +83,7 @@ class ServerForm extends Component {
 
   onInputStateChange(state) {
     const { inputs } = this.state;
-    const input = inputs.find(elem => elem.name === state.name);
+    const input = inputs.find((elem) => elem.name === state.name);
     input.value = state.value;
     input.isValid = state.isValid;
     const isValid = ServerForm.checkValidity(inputs);
@@ -119,7 +120,7 @@ class ServerForm extends Component {
         }
         break;
       default:
-        console.log(`ServerForm[${name}] Enctype property is incorrect`)
+        console.log(`ServerForm[${name}] Enctype property is incorrect`);
         formData = {};
     }
 
@@ -147,11 +148,11 @@ class ServerForm extends Component {
 
     let inputList = <div />;
     if (isReady) {
-      inputList = inputs.map(input => (
+      inputList = inputs.map((input) => (
         <Input
           key={input.name}
           {...input}
-          onStateChange={data => this.onInputStateChange(data)}
+          onStateChange={(data) => this.onInputStateChange(data)}
         />
       ));
     }

@@ -20,7 +20,7 @@ class TextInput extends Component {
 
     if (!value || value.trim() === '') {
       if (rules.required) {
-        result.error = 'Это обязательное поле';
+        result.error = 'This is a required field';
       } else {
         result.isValid = true;
       }
@@ -29,14 +29,14 @@ class TextInput extends Component {
 
     if (rules.min_length) {
       if (value.length < rules.min_length) {
-        result.error = `Минимальная длина поля - ${rules.min_length} символов`;
+        result.error = `The minimum field length is ${rules.min_length} characters`;
         return result;
       }
     }
 
     if (rules.max_length) {
       if (value.length > rules.max_length) {
-        result.error = `Максимальная длина поля - ${rules.max_length} символов`;
+        result.error = `The maximum field length is ${rules.max_length} characters`;
         return result;
       }
     }
@@ -110,7 +110,7 @@ class TextInput extends Component {
         error={!isCorrect}
         required={rules.required}
 
-        onChange={event => this.onChange(event)}
+        onChange={(event) => this.onChange(event)}
 
         multiline={multiline}
         rows={rows}

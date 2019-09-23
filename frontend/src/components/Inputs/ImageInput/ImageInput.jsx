@@ -24,7 +24,7 @@ class ImageInput extends Component {
 
     if (!value) {
       if (rules.required) {
-        result.error = 'Это обязательное поле';
+        result.error = 'This is a required field';
       } else {
         result.isValid = true;
       }
@@ -32,16 +32,16 @@ class ImageInput extends Component {
     }
 
     if (rules.mimetypes) {
-      const mimetype = rules.mimetypes.find(elem => elem === value.type);
+      const mimetype = rules.mimetypes.find((elem) => elem === value.type);
       if (!mimetype) {
-        result.error = 'Некорректный формат изображения (допустимый формат - png)';
+        result.error = 'Incorrect image format (valid format is png or jpg)';
         return result;
       }
     }
 
     if (rules.max_size) {
       if (value.size > rules.max_size) {
-        result.error = 'Изображение слишком велико';
+        result.error = 'Image is too large';
         return result;
       }
     }

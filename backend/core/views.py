@@ -1,8 +1,13 @@
+import os
+
 from rest_framework.views import APIView
+from django.http import HttpResponse
 
 from rest_framework import status, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+
+from backend.settings import MEDIA_ROOT
 
 from .models import Folder, Image
 from .serializers import FolderSerializer, ImageSerializer,\
@@ -96,6 +101,22 @@ class ImageUpdateView(APIView):
                 'parent_folder_key': image.folder.key.hex,
                 'mime': image.mime,
             }, status=status.HTTP_200_OK)
+
+        except Image.DoesNotExist:
+            return Response({'detail': 'Incorrect image key'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ImageDownloadView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    def get(self, request, key=None):
+        try:
+            image = Image.objects.get(key=key)
+            image_path = os.path.join(MEDIA_ROOT, str(image.content))
+            response = HttpResponse(content_type="application/octet-stream")
+            response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(image_path)
+            with open(image_path, 'rb') as file:
+                response.write(file.read())
+            return response
 
         except Image.DoesNotExist:
             return Response({'detail': 'Incorrect image key'}, status=status.HTTP_400_BAD_REQUEST)

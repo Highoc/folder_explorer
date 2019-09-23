@@ -5,22 +5,22 @@ const styles = ({ palette }) => ({
 
   body: {
     border: '1px solid',
-    borderColor: palette.secondary.dark,
+    borderColor: '#bdbdbd',
     borderRadius: '5px',
     '&:hover': {
-      borderColor: palette.secondary.light,
+      borderColor: '#424242',
     },
     '&[error="true"]': {
-      borderColor: palette.error.dark,
+      borderColor: '#f44336',
     },
   },
 
   legend: {
     padding: '0 5px 0 5px',
     fontSize: '12px',
-    color: palette.secondary.dark,
+    color: '#757575',
     '&[error="true"]': {
-      color: palette.error.dark,
+      color: '#f44336',
     },
   },
 
@@ -28,7 +28,7 @@ const styles = ({ palette }) => ({
     height: '450px',
     width: '600px',
     border: '1px solid',
-    borderColor: palette.secondary.dark,
+    borderColor: '#bdbdbd',
     borderRadius: '5px',
   },
 
@@ -55,11 +55,11 @@ const styles = ({ palette }) => ({
   button: {
     height: '100%',
     float: 'right',
-    color: palette.secondary.main,
+    color: '#9e9e9e',
   },
 
   placeholder: {
-    color: palette.secondary.main,
+    color: '#757575',
   },
 
   input: {
@@ -71,9 +71,9 @@ const styles = ({ palette }) => ({
   error: {
     margin: '5px 0 0 15px',
     fontSize: '12px',
-    color: palette.secondary.dark,
+    color: '#9e9e9e',
     '&[error="true"]': {
-      color: palette.error.dark,
+      color: '#f44336',
     },
   },
 });
