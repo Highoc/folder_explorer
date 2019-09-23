@@ -1,0 +1,21 @@
+.media {
+    height: 70%;
+    object-fit: contain !important;
+}
+
+.card {
+    height: 800px;
+}
+
+.content {
+    padding: 21px !important;
+    height: 25%;
+    overflow: hidden;
+}
+
+.description {
+    padding-top: 3% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    height: 50% !important;
+}

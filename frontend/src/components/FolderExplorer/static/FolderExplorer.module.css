@@ -7,10 +7,6 @@
     margin: 0 5px 0 5px;
 }
 
-.card {
-    height: 500px;
-}
-
 .nested {
     padding-left: 20px;
 }
@@ -19,14 +15,15 @@
     margin-right: 5px;
 }
 
-.title {
-    padding-top: 15px;
-}
-
-.subheader {
-    padding: 5px 10px 5px 10px;
-}
-
 .link {
     color: black;
+}
+
+.close {
+    margin: 5px 0 5px 0;
+    float: right;
+}
+
+.content {
+    margin-bottom: 10px;
 }

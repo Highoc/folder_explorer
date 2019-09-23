@@ -1,9 +1,9 @@
 import React from 'react';
 import './App.css';
 
-import Container from '@material-ui/core/Container'
+import Container from '@material-ui/core/Container';
 
-import FolderExplorer from "./components/FolderExplorer";
+import FolderExplorer from './components/FolderExplorer';
 
 function App() {
   return (

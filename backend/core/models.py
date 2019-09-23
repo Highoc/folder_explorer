@@ -47,7 +47,9 @@ class Image(models.Model):
 
     description = models.TextField(
         max_length=1024,
-        verbose_name='Описание изображения'
+        verbose_name='Описание изображения',
+        default='',
+        blank=True,
     )
 
     content = models.ImageField(

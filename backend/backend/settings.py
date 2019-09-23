@@ -26,10 +26,12 @@ with open(os.path.join(BASE_DIR, 'DJANGO_SECRET_KEY'), 'r') as key:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.43.230',
+]
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
+    'http://localhost:3000',
 ]
 
 # Application definition
@@ -130,5 +132,3 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'uploads')
 MEDIA_URL = '/uploads/'
-
-print(MEDIA_ROOT)

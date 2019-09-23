@@ -2,17 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  Folder as FolderIcon, AddCircleOutline, ExpandLess, ExpandMore, Settings,
+  Folder as FolderIcon, AddCircleOutline, Close,
+  ExpandLess, ExpandMore, Settings, AddPhotoAlternate,
 } from '@material-ui/icons';
 
 import {
   List, ListItem, ListItemIcon, ListItemText, Collapse,
+  Dialog, DialogContent, DialogTitle,
 } from '@material-ui/core';
 
+import ServerForm from '../ServerForm/ServerForm';
 import Image from './Image';
 
-import classes from './FolderExplorer.module.css';
-
+import classes from './static/FolderExplorer.module.css';
 
 class Folder extends Component {
   constructor(props) {
@@ -31,46 +33,144 @@ class Folder extends Component {
       folders,
       images,
 
+      name: props.name,
+      action: {},
+
       isOpened: false,
+      isOpenedDialog: false,
     };
   }
 
-  handleClick() {
+  componentWillReceiveProps(nextProps, nextContext) {
+    const { filetree } = this.props;
+    if (nextProps.filetree !== filetree) {
+      const { id, filetree: filetreeNew } = nextProps;
+      let folders = [];
+      let images = [];
+
+      if (filetreeNew[id] !== undefined) {
+        folders = filetreeNew[id].folders;
+        images = filetreeNew[id].images;
+      }
+
+      this.setState({ folders, images });
+    }
+  }
+
+  onClick(event) {
+    event.stopPropagation();
     const { isOpened } = this.state;
     this.setState({ isOpened: !isOpened });
   }
 
-  handleAddClick(event) {
-    alert('add');
-    event.stopPropagation();
+  onDialogClick() {
+    const { isOpenedDialog } = this.state;
+    this.setState({ isOpenedDialog: !isOpenedDialog });
   }
 
-  handleEditClick(event) {
-    alert('edit');
+  onCreateFolderClick(event) {
     event.stopPropagation();
+
+    const { id, forms } = this.props;
+    this.setState({
+      action: {
+        title: 'Create Folder Menu',
+        type: 'folder-create',
+        action: 'core/folder/create/',
+        enctype: 'application/json',
+        inputs: forms.folder.create,
+        hiddenInputs: [{ name: 'parent_folder_key', value: id }],
+      },
+    });
+
+    this.onDialogClick();
+  }
+
+  onCreateImageClick(event) {
+    event.stopPropagation();
+
+    const { id, forms } = this.props;
+    this.setState({
+      action: {
+        title: 'Create Image Menu',
+        type: 'image-create',
+        action: 'core/image/create/',
+        enctype: 'multipart/form-data',
+        inputs: forms.image.create,
+        hiddenInputs: [{ name: 'folder_key', value: id }],
+      },
+    });
+
+    this.onDialogClick();
+  }
+
+  onUpdateFolderClick(event) {
+    event.stopPropagation();
+
+    const { id, parentKey, forms } = this.props;
+    this.setState({
+      action: {
+        title: 'Update Folder Menu',
+        type: 'folder-update',
+        action: `core/folder/update/${id}/`,
+        enctype: 'application/json',
+        inputs: forms.folder.update,
+        hiddenInputs: [{ name: 'parent_folder_key', value: parentKey }],
+      },
+    });
+
+    this.onDialogClick();
+  }
+
+  onSubmitSuccess(data) {
+    const { action, images, folders } = this.state;
+
+    switch (action.type) {
+      case 'folder-create':
+        folders.push(data);
+        this.setState({ folders });
+        break;
+      case 'folder-update':
+        this.setState({ name: data.name });
+        break;
+      case 'image-create':
+        images.push(data);
+        this.setState({ images });
+        break;
+      default:
+        console.log('error');
+    }
+
+    this.onDialogClick();
   }
 
   render() {
-    const { folders, images, isOpened } = this.state;
+    const {
+      folders, images, isOpened, isOpenedDialog, action, name,
+    } = this.state;
 
-    const { name, filetree } = this.props;
+    const { filetree, onChangePreview, forms } = this.props;
 
     const isEmpty = !(folders.length || images.length);
 
     return (
       <div className={classes.nested}>
-        <ListItem button={!isEmpty} onClick={() => this.handleClick()}>
+        <ListItem button={!isEmpty} onClick={(event) => this.onClick(event)}>
           <ListItemIcon>
             <FolderIcon />
           </ListItemIcon>
           <ListItemText primary={name} />
           <Settings
             className={classes.icon}
-            onClick={(event) => this.handleEditClick(event)}
+            onClick={(event) => this.onUpdateFolderClick(event)}
           />
           <AddCircleOutline
             className={classes.icon}
-            onClick={(event) => this.handleAddClick(event)}
+            onClick={(event) => this.onCreateFolderClick(event)}
+          />
+          <AddPhotoAlternate
+            className={classes.icon}
+            onClick={(event) => this.onCreateImageClick(event)}
           />
           { !isEmpty ? isOpened ? <ExpandLess /> : <ExpandMore /> : <ExpandMore opacity="0.3" /> }
         </ListItem>
@@ -82,9 +182,12 @@ class Folder extends Component {
                   folders.map((current) => (
                     <Folder
                       name={current.name}
-                      key={current.key}
                       id={current.key}
+                      key={current.key}
+                      parentKey={current.parent_folder_key}
                       filetree={filetree}
+                      forms={forms}
+                      onChangePreview={(value) => onChangePreview(value)}
                     />
                   ))
                 }
@@ -92,9 +195,13 @@ class Folder extends Component {
                   images.map((current) => (
                     <Image
                       name={current.name}
-                      key={current.key}
+                      description={current.description}
                       id={current.key}
+                      key={current.key}
+                      parentKey={current.parent_folder_key}
                       mime={current.mime}
+                      forms={forms}
+                      onChangePreview={(value) => onChangePreview(value)}
                     />
                   ))
                 }
@@ -102,6 +209,28 @@ class Folder extends Component {
             </Collapse>
           ) : <div />
         }
+        <Dialog
+          open={isOpenedDialog}
+          maxWidth="md"
+          fullWidth
+          onClose={() => this.onDialogClick()}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">
+            {action.title}
+            <Close className={classes.close} onClick={() => this.onDialogClick()} />
+          </DialogTitle>
+          <DialogContent className={classes.content}>
+            <ServerForm
+              action={action.action}
+              enctype={action.enctype}
+              name={action.type}
+              inputs={action.inputs}
+              inputsHidden={action.hiddenInputs}
+              onSubmitSuccess={(data) => this.onSubmitSuccess(data)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -109,14 +238,11 @@ class Folder extends Component {
 
 export default Folder;
 
-/*
 Folder.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]).isRequired,
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  classes: PropTypes.object.isRequired,
-}; */
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  parentKey: PropTypes.string.isRequired,
+  filetree: PropTypes.object.isRequired,
+  forms: PropTypes.object.isRequired,
+  onChangePreview: PropTypes.func.isRequired,
+};

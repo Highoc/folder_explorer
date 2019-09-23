@@ -8,7 +8,7 @@ class FolderSerializer(serializers.ModelSerializer):
 
     def validate_parent_folder_key(self, value):
         try:
-            if value is None:
+            if value is None or value == 'root':
                 return None
             else:
                 return Folder.objects.get(key=value)
@@ -40,7 +40,7 @@ class ImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         image = Image(
             name=validated_data['name'],
-            description=validated_data['description'],
+            description=validated_data.get('description', ''),
             folder=validated_data['folder_key'],
             mime=validated_data['content'].content_type,
         )
@@ -70,3 +70,80 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta():
         model = Image
         fields = ('name', 'description', 'content', 'folder_key')
+
+
+def get_image_create_form():
+    form = [{
+        'type': 'text',
+        'name': 'name',
+        'value': '',
+        'label': 'Image name',
+        'placeholder': 'Enter image name...',
+        'rules': {
+            'max_length': 32,
+            'required': True
+        }
+    }, {
+        'type': 'textarea',
+        'name': 'description',
+        'value': '',
+        'label': 'Image description',
+        'placeholder': 'Enter image description...',
+        'rules': {
+            'max_length': 1024,
+            'required': False,
+        }
+    }, {
+        'type': 'image',
+        'name': 'content',
+        'previewUrl': '',
+        'label': 'Image preview',
+        'placeholder': 'Select image...',
+        'rules': {
+            'mimetypes': ['image/png', 'image/jpg'],
+            'max_size': 10*1024*1024,
+            'required': True,
+        },
+    }]
+
+    return form
+
+def get_image_update_form():
+    form = [{
+        'type': 'text',
+        'name': 'name',
+        'value': '',
+        'label': 'Image name',
+        'placeholder': 'Enter image name...',
+        'rules': {
+            'max_length': 32,
+            'required': True
+        }
+    }, {
+        'type': 'textarea',
+        'name': 'description',
+        'value': '',
+        'label': 'Image description',
+        'placeholder': 'Enter image description...',
+        'rules': {
+            'max_length': 1024,
+            'required': False,
+        }
+    }]
+
+    return form
+
+def get_folder_form():
+    form = [{
+        'type': 'text',
+        'name': 'name',
+        'value': '',
+        'label': 'Folder name',
+        'placeholder': 'Enter folder name...',
+        'rules': {
+            'max_length': 32,
+            'required': True
+        },
+    }]
+
+    return form

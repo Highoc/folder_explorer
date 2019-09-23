@@ -1,3 +1,3 @@
-import FolderExplorer from "./FolderExplorer";
+import FolderExplorer from './FolderExplorer';
 
 export default FolderExplorer;

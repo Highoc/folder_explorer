@@ -1,47 +1,120 @@
 import React, { Component } from 'react';
 
 import {
-  List, ListSubheader,
-  Card, CardActionArea, CardActions, CardContent, CardMedia,
+  List, Paper, Grid,
 } from '@material-ui/core';
-
-import TextField from '@material-ui/core/TextField';
-
-import Paper from '@material-ui/core/Paper';
-
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
 
 import axios from 'axios';
 
 import Folder from './Folder';
 import Image from './Image';
+import Preview from './Preview';
+import Subheader from './Subheader';
 
-import classes from './FolderExplorer.module.css';
-
+import classes from './static/FolderExplorer.module.css';
 
 class FolderExplorer extends Component {
   constructor(props) {
     super(props);
-    this.state = { filetree: {}, isLoaded: false };
+    this.state = {
+      filetree: {},
+
+      forms: {
+        folder: { create: [], update: [] },
+        image: { create: [], update: [] },
+      },
+
+      isLoaded: false,
+      currentPreview: undefined,
+    };
   }
 
   async componentDidMount() {
     try {
-      const filetree = await axios.get('http://localhost:8000/core/search/');
+      const filetree = await axios.get('http://192.168.43.230:8000/core/search/');
       this.setState({ filetree: filetree.data, isLoaded: true });
-      console.log(filetree);
+
+      const patch = '00000000000000000000000000000000';
+      const folderCreateForm = await axios.get('http://192.168.43.230:8000/core/folder/create/');
+      const folderUpdateForm = await axios.get(`http://192.168.43.230:8000/core/folder/update/${patch}/`);
+      const imageCreateForm = await axios.get('http://192.168.43.230:8000/core/image/create/');
+      const imageUpdateForm = await axios.get(`http://192.168.43.230:8000/core/image/update/${patch}/`);
+
+      this.setState({
+        forms: {
+          folder: {
+            create: folderCreateForm.data,
+            update: folderUpdateForm.data,
+          },
+          image: {
+            create: imageCreateForm.data,
+            update: imageUpdateForm.data,
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  onChangePreview(image) {
+    this.setState({ currentPreview: image });
+  }
+
+  async reloadTree(query) {
+    try {
+      const filetree = await axios.get(`http://192.168.43.230:8000/core/search/?search=${query}`);
+      if (Object.keys(filetree.data).length === 0) {
+        filetree.data = null;
+      }
+      this.setState({ filetree: filetree.data, isLoaded: true });
     } catch (error) {
       console.log(error);
     }
   }
 
   render() {
-    const { filetree, isLoaded } = this.state;
+    const {
+      filetree, isLoaded, forms, currentPreview,
+    } = this.state;
 
     if (!isLoaded) {
       return <div>Not downloaded yet</div>;
+    }
+
+    let list = <div />;
+    if (filetree !== null) {
+      list = (
+        <div>
+          {
+          filetree.root.folders.map((current) => (
+            <Folder
+              name={current.name}
+              id={current.key}
+              key={current.key}
+              parentKey={current.parent_folder_key}
+              filetree={filetree}
+              forms={forms}
+              onChangePreview={(value) => this.onChangePreview(value)}
+            />
+          ))
+        }
+          {
+          filetree.root.images.map((current) => (
+            <Image
+              name={current.name}
+              description={current.description}
+              id={current.key}
+              key={current.key}
+              parentKey={current.parent_folder_key}
+              mime={current.mime}
+              forms={forms}
+              onChangePreview={(value) => this.onChangePreview(value)}
+            />
+          ))
+        }
+        </div>
+      );
     }
 
     return (
@@ -50,92 +123,16 @@ class FolderExplorer extends Component {
           <Paper className={classes.paper} square>
             <List
               component="nav"
-              subheader={<Subheader />}
+              subheader={<Subheader onSubmit={(query) => this.reloadTree(query)} />}
             >
-              {
-                filetree.root.folders.map((current) => (
-                  <Folder
-                    name={current.name}
-                    key={current.key}
-                    id={current.key}
-                    filetree={filetree}
-                  />
-                ))
-              }
-              {
-                filetree.root.images.map((current) => (
-                  <Image
-                    name={current.name}
-                    key={current.key}
-                    id={current.key}
-                    mime={current.mime}
-                  />
-                ))
-              }
+              {list}
             </List>
           </Paper>
         </Grid>
         <Grid item xs={7}>
-          <Card className={classes.card} square>
-            <CardActionArea>
-              <CardMedia
-                component="img"
-                alt="Contemplative Reptile"
-                height="140"
-                image="/static/images/cards/contemplative-reptile.jpg"
-                title="Contemplative Reptile"
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="h2">
-                  Lizard
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-                  across all continents except Antarctica
-                </Typography>
-              </CardContent>
-            </CardActionArea>
-            <CardActions>
-              <Button size="small" color="primary">
-                Share
-              </Button>
-              <Button size="small" color="primary">
-                Learn More
-              </Button>
-            </CardActions>
-          </Card>
+          <Preview image={currentPreview} />
         </Grid>
       </Grid>
-    );
-  }
-}
-
-class Subheader extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { search: {}, isLoaded: false };
-  }
-
-  render() {
-    return (
-      <ListSubheader className={classes.subheader} component="div" id="nested-list-subheader">
-        <Grid container>
-          <Grid item xs={6}>
-            <Typography className={classes.title} variant="h5">
-              Folder Explorer
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <form onSubmit={() => {alert('submit');}}>
-              <TextField
-                id="outlined-name"
-                label="Search"
-                variant="outlined"
-              />
-            </form>
-          </Grid>
-        </Grid>
-      </ListSubheader>
     );
   }
 }
