@@ -46,7 +46,8 @@ class ImageSerializer(serializers.ModelSerializer):
         )
 
         image.save()
-        image.content.save(image.key.hex, validated_data['content'])
+        type = validated_data['content'].content_type.split('/')[1]
+        image.content.save(f'{image.key.hex}.{type}', validated_data['content'])
 
         return image
 

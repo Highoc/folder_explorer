@@ -105,6 +105,7 @@ class SearchView(APIView):
                 'description': image.description,
                 'key': image.key.hex,
                 'parent_folder_key': key,
+                'mime': image.mime,
             }
 
             if image_dict not in filetree[key]['images']:

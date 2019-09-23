@@ -1,0 +1,32 @@
+.root {
+    margin-top: 20px;
+    height: 800px;
+}
+
+.paper {
+    margin: 0 5px 0 5px;
+}
+
+.card {
+    height: 500px;
+}
+
+.nested {
+    padding-left: 20px;
+}
+
+.icon {
+    margin-right: 5px;
+}
+
+.title {
+    padding-top: 15px;
+}
+
+.subheader {
+    padding: 5px 10px 5px 10px;
+}
+
+.link {
+    color: black;
+}
